@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soul Match - Find Your Perfect Match</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-text-primary: #000;
+            --color-text-secondary: #666;
+            --color-text-tertiary: #999;
+            --color-background-primary: #fff;
+            --color-background-secondary: #f5f5f5;
+            --color-border-tertiary: rgba(0, 0, 0, 0.1);
+            --color-border-secondary: rgba(0, 0, 0, 0.2);
+            --color-border-primary: rgba(0, 0, 0, 0.4);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-text-primary: #fff;
+                --color-text-secondary: #aaa;
+                --color-text-tertiary: #777;
+                --color-background-primary: #1a1a1a;
+                --color-background-secondary: #2a2a2a;
+                --color-border-tertiary: rgba(255, 255, 255, 0.1);
+                --color-border-secondary: rgba(255, 255, 255, 0.2);
+                --color-border-primary: rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: var(--color-background-primary);
+            color: var(--color-text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* ===== LANDING PAGE ===== */
+        .landing-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(230, 241, 251, 0.3) 0%, rgba(230, 237, 254, 0.3) 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .landing-page {
+                background: linear-gradient(135deg, rgba(40, 50, 80, 0.3) 0%, rgba(30, 40, 70, 0.3) 100%);
+            }
+        }
+
+        .bubble-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            cursor: pointer;
+        }
+
+        .bubble {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bubble svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 12px rgba(220, 38, 38, 0.25));
+        }
+
+        .bubble:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        .bubble.burst {
+            animation: burstAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes burstAnimation {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .particle-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-text-primary);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .particle.animate {
+            animation: particleFloat 1s ease-out forwards;
+        }
+
+        @keyframes particleFloat {
+            to {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
+
+        .welcome-text {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            opacity: 0;
+            pointer-events: none;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.5;
+            letter-spacing: 2px;
+            width: 90vw;
+        }
+
+        .welcome-text.show {
+            animation: welcomeFadeIn 0.8s ease-out 0.3s forwards;
+        }
+
+        @keyframes welcomeFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .subtitle {
+            position: absolute;
+            bottom: auto;
+            top: 55%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: var(--color-text-secondary);
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+        }
+
+        .subtitle.show {
+            animation: fadeInUp 0.8s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .start-button {
+            position: absolute;
+            bottom: auto;
+            top: 88%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0;
+            background: transparent;
+            border: none;
+            color: var(--color-text-primary);
+            font-size: 0;
+            font-weight: 300;
+            font-family: 'Playfair Display', serif;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .start-button svg {
+            width: 60px;
+            height: 60px;
+            filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.15));
+        }
+
+        .start-button:hover svg {
+            filter: drop-shadow(0 0 12px rgba(220, 38, 38, 0.3));
+        }
+
+        .start-button.show {
+            animation: fadeIn 0.8s ease-out 1.2s forwards;
+            pointer-events: auto;
+        }
+
+        .start-button:hover {
+            background: var(--color-background-secondary);
+            border-color: var(--color-border-primary);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===== QUESTIONNAIRE PAGE ===== */
+        .questionnaire-page {
+            display: block;
+            min-height: 100vh;
+            padding: 0;
+            background: var(--color-background-primary);
+        }
+
+        .questionnaire-page.active {
+            display: block;
+        }
+
+        .questionnaire-container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 80px;
+            margin-left: 80px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: var(--color-background-secondary);
+            border-radius: 2px;
+            margin-bottom: 2rem;
+            margin-top: 0;
+            overflow: hidden;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 1rem;
+            margin-left: 0;
+            margin-right: 0;
+            text-align: center;
+        }
+
+        .question-wrapper {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+            width: 100%;
+        }
+
+        .question-wrapper.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .question-wrapper.exit-left {
+            animation: exitLeft 0.4s ease-out forwards;
+        }
+
+        @keyframes exitLeft {
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
+
+        .question-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .question-subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 0.5px solid var(--color-border-tertiary);
+            border-radius: 8px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            color: var(--color-text-primary);
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            background: var(--color-background-primary);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-border-secondary);
+            background: var(--color-background-primary);
+        }
+
+        textarea::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            margin-top: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 2rem;
+            margin-left: 0;
+            margin-right: 0;
+            margin-bottom: 0;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 0.5px solid var(--color-border-secondary);
+            background: transparent;
+            color: var(--color-text-primary);
+            font-family: 'Playfair Display', serif;
+        }
+
+        button:hover {
+            background: var(--color-background-secondary);
+            border-color: var(--color-border-primary);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-next {
+            flex: 1;
+            margin-left: auto;
+        }
+
+        .btn-back {
+            flex: 0 0 auto;
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 2rem 0;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .completion-screen.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .completion-icon {
+            font-size: 48px;
+            margin-bottom: 1.5rem;
+        }
+
+        .completion-title {
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .completion-text {
+            font-size: 16px;
+            color: var(--color-text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .completion-button {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- LANDING PAGE -->
+    <div class="landing-page" id="landingPage">
+        <div class="bubble-wrapper" id="bubbleWrapper">
+            <div class="bubble" id="bubble">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50,90 C25,75 10,65 10,50 C10,38 18,28 28,28 C35,28 42,33 50,40 C58,33 65,28 72,28 C82,28 90,38 90,50 C90,65 75,75 50,90 Z" fill="#DC2626" stroke="none"/>
+                </svg>
+            </div>
+            <div class="welcome-text" id="welcomeText">Welcome to your<br/>journey to find a<br/>special one</div>
+            <div class="subtitle" id="subtitle">Fill the questionnaire to start</div>
+            <button class="start-button" id="startButton">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50,90 C25,75 10,65 10,50 C10,38 18,28 28,28 C35,28 42,33 50,40 C58,33 65,28 72,28 C82,28 90,38 90,50 C90,65 75,75 50,90 Z" fill="#DC2626" stroke="none"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- QUESTIONNAIRE PAGE -->
+    <div class="questionnaire-page" id="questionnairePage">
+        <div class="questionnaire-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="progress-text" id="progressText">Question 1 of 5</div>
+
+            <!-- Question 1 -->
+            <div class="question-wrapper active" id="q1">
+                <h2 class="question-title">Please describe your type</h2>
+                <p class="question-subtitle">What qualities attract you in a partner?</p>
+                <div class="form-group">
+                    <textarea id="ans1" placeholder="Share what you're drawn to..."></textarea>
+                    <div class="char-count"><span id="count1">0</span>/500</div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-wrapper" id="q2">
+                <h2 class="question-title">What values are important to you?</h2>
+                <p class="question-subtitle">Help us understand what matters most</p>
+                <div class="form-group">
+                    <textarea id="ans2" placeholder="Describe your core values..."></textarea>
+                    <div class="char-count"><span id="count2">0</span>/500</div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-wrapper" id="q3">
+                <h2 class="question-title">What characteristics you look in a person?</h2>
+                <p class="question-subtitle">Think about personality and behavior traits</p>
+                <div class="form-group">
+                    <textarea id="ans3" placeholder="Share the characteristics..."></textarea>
+                    <div class="char-count"><span id="count3">0</span>/500</div>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-wrapper" id="q4">
+                <h2 class="question-title">How do you spend your free time?</h2>
+                <p class="question-subtitle">Tell us about your hobbies and interests</p>
+                <div class="form-group">
+                    <textarea id="ans4" placeholder="Describe your typical weekend or evening..."></textarea>
+                    <div class="char-count"><span id="count4">0</span>/500</div>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-wrapper" id="q5">
+                <h2 class="question-title">Please list your favorite places in London</h2>
+                <p class="question-subtitle">Share your favorite spots in the city</p>
+                <div class="form-group">
+                    <textarea id="ans5" placeholder="e.g., Notting Hill, British Museum, Shoreditch..."></textarea>
+                    <div class="char-count"><span id="count5">0</span>/500</div>
+                </div>
+            </div>
+
+            <!-- Completion Screen -->
+            <div class="completion-screen" id="completionScreen">
+                <div class="completion-icon">✓</div>
+                <h2 class="completion-title">All set!</h2>
+                <p class="completion-text">Thank you for completing your profile. Your questionnaire has been saved and we'll begin matching you with compatible people.</p>
+                <button class="btn-next completion-button" onclick="alert('Matches feature coming soon!')">View my matches</button>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="button-group" id="buttonGroup">
+                <button class="btn-back" id="backBtn" style="display: none;">Back</button>
+                <button class="btn-next" id="nextBtn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== LANDING PAGE LOGIC =====
+        const bubble = document.getElementById('bubble');
+        const bubbleWrapper = document.getElementById('bubbleWrapper');
+        const welcomeText = document.getElementById('welcomeText');
+        const subtitle = document.getElementById('subtitle');
+        const startButton = document.getElementById('startButton');
+        let isBurst = false;
+
+        function createParticles() {
+            const particleCount = 12;
+            const angleSlice = (Math.PI * 2) / particleCount;
+
+            for (let i = 0; i < particleCount; i++) {
+                const angle = angleSlice * i;
+                const distance = 150;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.innerHTML = '<div class="particle-dot"></div>';
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                particle.style.left = '150px';
+                particle.style.top = '150px';
+
+                bubbleWrapper.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.classList.add('animate');
+                }, 10);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 1100);
+            }
+        }
+
+        bubble.addEventListener('click', function() {
+            if (isBurst) return;
+            isBurst = true;
+
+            bubble.classList.add('burst');
+            createParticles();
+
+            setTimeout(() => {
+                welcomeText.classList.add('show');
+                subtitle.classList.add('show');
+                startButton.classList.add('show');
+            }, 300);
+        });
+
+        startButton.addEventListener('click', function() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('questionnairePage').classList.add('active');
+            document.getElementById('ans1').focus();
+        });
+
+        // ===== QUESTIONNAIRE LOGIC =====
+        const questions = ['q1', 'q2', 'q3', 'q4', 'q5'];
+        const answers = ['ans1', 'ans2', 'ans3', 'ans4', 'ans5'];
+        const counts = ['count1', 'count2', 'count3', 'count4', 'count5'];
+        let currentQuestion = 0;
+        const maxChars = 500;
+
+        const responses = {};
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+        }
+
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                const element = document.getElementById(q);
+                if (i === index) {
+                    element.classList.remove('exit-left');
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
+            });
+
+            document.getElementById('backBtn').style.display = currentQuestion === 0 ? 'none' : 'block';
+            updateProgress();
+
+            if (currentQuestion === questions.length - 1) {
+                document.getElementById('nextBtn').textContent = 'Submit';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next';
+            }
+        }
+
+        function nextQuestion() {
+            const currentAns = document.getElementById(answers[currentQuestion]);
+            responses[currentQuestion] = currentAns.value;
+
+            if (currentQuestion < questions.length - 1) {
+                document.getElementById(questions[currentQuestion]).classList.add('exit-left');
+                currentQuestion++;
+                showQuestion(currentQuestion);
+                document.getElementById(answers[currentQuestion]).focus();
+            } else {
+                submitQuestionnaire();
+            }
+        }
+
+        function prevQuestion() {
+            const currentAns = document.getElementById(answers[currentQuestion]);
+            responses[currentQuestion] = currentAns.value;
+
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+                document.getElementById(answers[currentQuestion]).focus();
+            }
+        }
+
+        function submitQuestionnaire() {
+            document.getElementById('buttonGroup').style.display = 'none';
+            questions.forEach(q => document.getElementById(q).classList.remove('active'));
+            document.getElementById('completionScreen').classList.add('show');
+
+            const allResponses = {
+                'type': responses[0],
+                'values': responses[1],
+                'characteristics': responses[2],
+                'free_time': responses[3],
+                'london_places': responses[4]
+            };
+
+            console.log('Responses saved:', allResponses);
+            localStorage.setItem('matchmakingProfile', JSON.stringify(allResponses));
+        }
+
+        answers.forEach((ansId, idx) => {
+            const element = document.getElementById(ansId);
+            const countElement = document.getElementById(counts[idx]);
+
+            element.addEventListener('input', (e) => {
+                const length = e.target.value.length;
+                if (length > maxChars) {
+                    e.target.value = e.target.value.substring(0, maxChars);
+                }
+                countElement.textContent = Math.min(e.target.value.length, maxChars);
+            });
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+        document.getElementById('backBtn').addEventListener('click', prevQuestion);
+
+        showQuestion(0);
+    </script>
+</body>
+</html>
